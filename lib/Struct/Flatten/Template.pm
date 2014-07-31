@@ -30,7 +30,7 @@ Struct::Flatten::Template - flatten structures using a template
     my $idx = $args->{_index};
     my $col = $args->{column};
 
-    $data[$idx] = [ ] if $idx > $#data;
+    $data[$idx] ||= [ ];
     $data[$idx]->[$col] = $val;
   };
 
