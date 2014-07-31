@@ -27,8 +27,25 @@ Struct::Flatten::Template - flatten structures using a template
   my $hnd = sub {
     my ($obj, $val, $args) = @_;
 
+    my $idx = $args->{_index};
+    my $col = $args->{column};
+
+    $data[$idx] = [ ] if $idx > $#data;
+    $data[$idx]->[$col] = $val;
   };
 
+  my $data = {
+    docs => [
+      { key => 'A', sum => { value => 10 } },
+      { key => 'B', sum => { value =>  4 } },
+      { key => 'C', sum => { value => 18 } },
+    ],
+  };
+
+  my $p = Struct::Flatten::Template->new(
+    template => $tpl,
+    handler  => $hnd,
+  );
 
 =cut
 
