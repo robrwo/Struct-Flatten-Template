@@ -57,5 +57,6 @@ sub process_ARRAY {
         for @{$struct};
 }
 
+use namespace::autoclean;
 
 1;
