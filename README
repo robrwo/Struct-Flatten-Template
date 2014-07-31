@@ -1,0 +1,83 @@
+NAME
+    Struct::Flatten::Template - flatten structures using a template
+
+SYNOPSYS
+      use Struct::Flatten::Template;
+
+      my $tpl = {
+        docs => [
+          {
+             key => \ { column => 0 },
+             sum => {
+                value => \ { column => 1 },
+          }
+        ],
+      };
+
+      my @data = ( );
+
+      my $hnd = sub {
+        my ($obj, $val, $args) = @_;
+
+        my $idx = $args->{_index};
+        my $col = $args->{column};
+
+        $data[$idx] ||= [ ];
+        $data[$idx]->[$col] = $val;
+      };
+
+      my $data = {
+        docs => [
+          { key => 'A', sum => { value => 10 } },
+          { key => 'B', sum => { value =>  4 } },
+          { key => 'C', sum => { value => 18 } },
+        ],
+      };
+
+      my $p = Struct::Flatten::Template->new(
+        template => $tpl,
+        handler  => $hnd,
+      );
+
+DESCRIPTION
+    TODO
+
+ATTRIBUTES
+  `handler'
+    The handler is a reference to a function, e.g.
+
+      sub {
+        my ($obj, $value, $args) = @_;
+        ...
+      }
+
+    where `$obj' is the `Struct::Flatten::Template' object, `$value' is the
+    value from the data structure being processed, and `$args' is a hash
+    reference from the template.
+
+    Note that `$args' may have additional keys added to it:
+
+    `_index'
+        This is the index in an array, or they key for a hash.
+
+METHODS
+  `run'
+  `test'
+SEE ALSO
+    Hash::Flatten
+
+AUTHOR
+    Robert Rothenberg, `<rrwo at cpan.org>'
+
+ACKNOWLEDGEMENTS
+    Foxtons, Ltd.
+
+LICENSE AND COPYRIGHT
+    Copyright 2014 Robert Rothenberg.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+
