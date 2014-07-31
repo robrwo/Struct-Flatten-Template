@@ -8,7 +8,7 @@ override 'process_ARRAY' => sub {
 
     for (my $i = 0; $i <= $#{$template}; $i++) {
         last if $i > $#{$struct};
-        $self->process( $struct->[$i], $template->[$i] );
+        $self->process( $struct->[$i], $template->[$i], $i );
     };
 };
 

@@ -4,6 +4,34 @@ use Moose;
 
 use version 0.77; our $VERSION = version->declare('v0.1.0');
 
+=head1 NAME
+
+Struct::Flatten::Template - flatten structures using a template
+
+=head1 SYNOPSYS
+
+  use Struct::Flatten::Template;
+
+  my $tpl = {
+    docs => [
+      {
+         key => \ { column => 0 },
+         sum => {
+            value => \ { column => 1 },
+      }
+    ],
+  };
+
+  my @data = ( );
+
+  my $hnd = sub {
+    my ($obj, $val, $args) = @_;
+
+  };
+
+
+=cut
+
 has 'handler' => (
     is  => 'ro',
     isa => 'Maybe[CodeRef]',
@@ -19,15 +47,17 @@ sub process {
 
     my $struct = $args[0];
     my $template = $#args ? $args[1] : $self->template;
+    my $index  = $args[2];
 
     if (my $type = (ref $template)) {
 
-        if (my $fn = $self->handler) {
+        if (($type eq 'REF') && (ref(${$template}) eq 'HASH') &&
+            (my $fn = $self->handler)) {
 
-            $fn->($self, $struct, ${$template})
-                if (($type eq 'REF') &&
-                    (ref( ${$template} ) eq 'HASH'));
+            my %args = %{${$template}};
+            $args{_index} = $index if defined $index;
 
+            $fn->($self, $struct, \%args);
         }
 
         return if ($type ne ref($struct));
@@ -46,14 +76,15 @@ sub process_HASH {
     my ($self, $struct, $template) = @_;
 
     foreach my $key (keys %{$template}) {
-        $self->process( $struct->{$key}, $template->{$key},  )
+        $self->process( $struct->{$key}, $template->{$key}, $key )
             if exists $struct->{$key};
     }
 }
 
 sub process_ARRAY {
     my ($self, $struct, $template) = @_;
-    $self->process( $_, $template->[0] )
+    my $index = 0;
+    $self->process( $_, $template->[0], $index++ )
         for @{$struct};
 }
 
