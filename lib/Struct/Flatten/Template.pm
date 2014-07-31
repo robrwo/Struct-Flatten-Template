@@ -102,6 +102,19 @@ sub test {
     $self->process($self->template);
 }
 
+sub get_handler {
+    my ($self, $template) = @_;
+
+    my $type = ref $template;
+    return unless $type;
+
+    if (($type eq 'REF') && (ref(${$template}) eq 'HASH')) {
+        return $self->handler;
+    } else {
+        return;
+    }
+}
+
 sub process {
     my ($self, @args) = @_;
 
@@ -111,21 +124,22 @@ sub process {
 
     if (my $type = (ref $template)) {
 
-        if (($type eq 'REF') && (ref(${$template}) eq 'HASH')  &&
-            (my $fn = $self->handler)) {
+        if (my $fn = $self->get_handler($template)) {
 
             my %args = %{${$template}};
             $args{_index} = $index if defined $index;
 
             $fn->($self, $struct, \%args);
-        }
 
-        return if $type ne ref($struct);
+        } else {
 
-        my $method = "process_${type}";
-        $method =~ s/::/_/g;
-        if (my $fn = $self->can($method)) {
-            $self->$fn($struct, $template);
+            return if $type ne ref($struct);
+
+            my $method = "process_${type}";
+            $method =~ s/::/_/g;
+            if (my $fn = $self->can($method)) {
+                $self->$fn($struct, $template);
+            }
         }
     }
  }
@@ -136,20 +150,14 @@ sub process_HASH {
     my ($self, $struct, $template) = @_;
     foreach my $key (keys %{$template}) {
 
-        if (my $type = ref($key)) {
+        if (my $fn = $self->get_handler($key)) {
 
-            if (($type eq 'REF') && (ref(${$key}) eq 'HASH')  &&
-                (my $fn = $self->handler)) {
-                my %args = %{${$key}};
-                foreach my $skey (keys %{$struct}) {
-                    $fn->($self, $skey, \%args);
-                }
-
-            } else {
-
-                # TODO: error?
-
+            my %args = %{${$key}};
+            foreach my $skey (keys %{$struct}) {
+                $fn->($self, $skey, \%args);
             }
+
+            last;
 
         } else {
             $self->process( $struct->{$key}, $template->{$key}, $key )
