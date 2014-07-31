@@ -1,0 +1,39 @@
+use strict;
+use warnings FATAL => 'all';
+use inc::Module::Install;
+
+name     'Struct-Flatten-Template';
+all_from 'lib/Struct/Flatten/Template.pm';
+license  'artistic2';
+
+# perl_version 5.010;
+
+tests_recursive('t');
+# tests_recursive('xt');
+
+resources (
+   homepage   => 'http://rrwo.tumblr.com',
+   license    => 'http://www.perlfoundation.org/artistic_license_2_0',
+   repository => 'git://github.com/robrwo/Struct-Flatten-Template.git',
+   bugtracker => 'https://github.com/robrwo/Struct-Flatten-Template/issues',
+);
+
+configure_requires ();
+
+build_requires (
+    'Test::Most'      => 0,
+);
+
+requires (
+    'Moose'                => 0,
+    'namespace::autoclean' => 0,
+    'version'              => 0.77,
+);
+
+test_requires (
+    'Test::Most'      => 0,
+);
+
+install_as_cpan;
+auto_install;
+WriteAll;
