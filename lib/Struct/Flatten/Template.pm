@@ -47,12 +47,11 @@ Struct::Flatten::Template - flatten structures using a template
     handler  => $hnd,
   );
 
-=cut
+=head1 DESCRIPTION
 
-has 'handler' => (
-    is  => 'ro',
-    isa => 'Maybe[CodeRef]',
-);
+=head1 ATTRIBUTES
+
+=cut
 
 has 'template' => (
     is => 'ro',
@@ -67,7 +66,29 @@ has 'is_testing' => (
    writer   => '_set_is_testing',
 );
 
+=head2 C<handler>
 
+The handler is a reference to a function, e.g.
+
+  sub {
+    my ($obj, $value, $args) = @_;
+    ...
+  }
+
+where C<$obj> is the C<Struct::Flatten::Template> object, C<$value> is
+the value from the data structure being processed, and C<$args> is a
+hash reference from the template.
+
+=cut
+
+has 'handler' => (
+    is  => 'ro',
+    isa => 'Maybe[CodeRef]',
+);
+
+=head1 METHODS
+
+=cut
 
 sub run {
     my ($self, $struct) = @_;
