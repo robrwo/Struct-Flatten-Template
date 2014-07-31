@@ -120,7 +120,7 @@ sub test {
     $self->process($self->template);
 }
 
-sub get_handler {
+sub _get_handler {
     my ($self, $template) = @_;
 
     my $type = ref $template;
@@ -136,13 +136,15 @@ sub get_handler {
 sub process {
     my ($self, @args) = @_;
 
+    no warnings 'recursion';
+
     my $struct = $args[0];
     my $template = $#args ? $args[1] : $self->template;
     my $index  = $args[2];
 
-    if (my $type = (ref $template)) {
+    if (my $type = ref($template)) {
 
-        if (my $fn = $self->get_handler($template)) {
+        if (my $fn = $self->_get_handler($template)) {
 
             my %args = %{${$template}};
             $args{_index} = $index if defined $index;
@@ -168,7 +170,7 @@ sub process_HASH {
     my ($self, $struct, $template) = @_;
     foreach my $key (keys %{$template}) {
 
-        if (my $fn = $self->get_handler($key)) {
+        if (my $fn = $self->_get_handler($key)) {
 
             my %args = %{${$key}};
             foreach my $skey (keys %{$struct}) {
