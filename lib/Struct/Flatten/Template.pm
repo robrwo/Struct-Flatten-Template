@@ -111,7 +111,7 @@ sub process {
 
     if (my $type = (ref $template)) {
 
-        if (($type eq 'REF') && (ref(${$template}) eq 'HASH') &&
+        if (($type eq 'REF') && (ref(${$template}) eq 'HASH')  &&
             (my $fn = $self->handler)) {
 
             my %args = %{${$template}};
@@ -124,7 +124,6 @@ sub process {
 
         my $method = "process_${type}";
         $method =~ s/::/_/g;
-
         if (my $fn = $self->can($method)) {
             $self->$fn($struct, $template);
         }
@@ -132,12 +131,30 @@ sub process {
  }
 
 
+
 sub process_HASH {
     my ($self, $struct, $template) = @_;
-
     foreach my $key (keys %{$template}) {
-        $self->process( $struct->{$key}, $template->{$key}, $key )
-            if exists $struct->{$key};
+
+        if (my $type = ref($key)) {
+
+            if (($type eq 'REF') && (ref(${$key}) eq 'HASH')  &&
+                (my $fn = $self->handler)) {
+                my %args = %{${$key}};
+                foreach my $skey (keys %{$struct}) {
+                    $fn->($self, $skey, \%args);
+                }
+
+            } else {
+
+                # TODO: error?
+
+            }
+
+        } else {
+            $self->process( $struct->{$key}, $template->{$key}, $key )
+                if exists $struct->{$key};
+        }
     }
 }
 

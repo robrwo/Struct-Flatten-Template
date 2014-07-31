@@ -27,6 +27,7 @@ build_requires (
 requires (
     'Moose'                => 0,
     'namespace::autoclean' => 0,
+    'Tie::RefHash'         => 0,
     'version'              => 0.77,
 );
 
