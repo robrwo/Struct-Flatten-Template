@@ -2,6 +2,8 @@ package Struct::Flatten::Template;
 
 use Moose;
 
+use version 0.77; our $VERSION = version->declare('v0.1.0');
+
 has 'callback' => (
     is  => 'ro',
     isa => 'Maybe[CodeRef]',
