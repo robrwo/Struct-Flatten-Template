@@ -17,8 +17,6 @@ package main;
 
 use Test::Most;
 
-
-
 my $tmpl = {
     foo => {
         bar => \ { column => 0 }
