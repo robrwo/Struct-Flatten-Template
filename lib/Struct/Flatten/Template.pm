@@ -4,7 +4,7 @@ use Moose;
 
 use version 0.77; our $VERSION = version->declare('v0.1.0');
 
-has 'callback' => (
+has 'handler' => (
     is  => 'ro',
     isa => 'Maybe[CodeRef]',
 );
@@ -22,9 +22,9 @@ sub process {
 
     if (my $type = (ref $template)) {
 
-        if (my $fn = $self->callback) {
+        if (my $fn = $self->handler) {
 
-            $fn->($self, $struct, $template)
+            $fn->($self, $struct, ${$template})
                 if (($type eq 'REF') &&
                     (ref( ${$template} ) eq 'HASH'));
 
