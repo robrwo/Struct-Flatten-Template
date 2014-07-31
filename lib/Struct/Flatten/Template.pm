@@ -109,6 +109,10 @@ use namespace::autoclean;
 
 1;
 
+=head1 SEE ALSO
+
+L<Hash::Flatten>
+
 =head1 AUTHOR
 
 Robert Rothenberg, C<< <rrwo at cpan.org> >>
