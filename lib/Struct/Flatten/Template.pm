@@ -59,6 +59,28 @@ has 'template' => (
     isa => 'Ref',
 );
 
+has 'is_testing' => (
+   is       => 'rw',
+   isa      => 'Bool',
+   default  => 0,
+   init_arg => undef,
+   writer   => '_set_is_testing',
+);
+
+
+
+sub run {
+    my ($self, $struct) = @_;
+    $self->_set_is_testing(0);
+    $self->process($struct);
+}
+
+sub test {
+    my ($self, $struct) = @_;
+    $self->_set_is_testing(1);
+    $self->process($self->template);
+}
+
 sub process {
     my ($self, @args) = @_;
 
@@ -77,7 +99,7 @@ sub process {
             $fn->($self, $struct, \%args);
         }
 
-        return if ($type ne ref($struct));
+        return if $type ne ref($struct);
 
         my $method = "process_${type}";
         $method =~ s/::/_/g;

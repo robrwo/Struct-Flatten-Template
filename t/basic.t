@@ -4,10 +4,10 @@ use_ok('Struct::Flatten::Template');
 
 my $tmpl = {
     foo => {
-        bar => \ { column => 0 }
+        bar => \ { column => 0, title => 'X' }
     },
     baz => [
-        \ { column => 1 },
+        \ { column => 1, indexed => 1, title => 'Y' },
         ],
 };
 
@@ -17,6 +17,7 @@ my $struct = {
     boom => 10,
 };
 
+my @head;
 my @row;
 
 sub handler {
@@ -24,10 +25,14 @@ sub handler {
 
     my $col = $args->{column};
 
-    if (defined $row[$col]) {
-        push @{$row[$col]}, $val;
+    if ($obj->is_testing) {
+
+        $head[$col] = $args->{title};
+
     } else {
-        $row[$col] = [ $val ];
+
+        $col += $args->{_index} if $args->{indexed};
+        $row[$col] = $val;
     }
 }
 
@@ -38,11 +43,18 @@ isa_ok
     ),
     'Struct::Flatten::Template';
 
-$p->process($struct);
+$p->test();
+
+is_deeply
+    \@head,
+    [qw/ X Y /],
+    'expected result from test';
+
+$p->run($struct);
 
 is_deeply
     \@row,
-    [ [qw/a/], [qw/b c d/] ],
-    'expected result';
+    [qw/ a b c d/],
+    'expected result from run';
 
 done_testing;

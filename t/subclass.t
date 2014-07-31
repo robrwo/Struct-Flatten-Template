@@ -54,7 +54,7 @@ isa_ok
     ),
     'Struct::Flatten::Template';
 
-$p->process($struct);
+$p->run($struct);
 
 is_deeply
     \@row,
