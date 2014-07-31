@@ -49,6 +49,8 @@ Struct::Flatten::Template - flatten structures using a template
 
 =head1 DESCRIPTION
 
+TODO
+
 =head1 ATTRIBUTES
 
 =cut
@@ -79,6 +81,16 @@ where C<$obj> is the C<Struct::Flatten::Template> object, C<$value> is
 the value from the data structure being processed, and C<$args> is a
 hash reference from the template.
 
+Note that C<$args> may have additional keys added to it:
+
+=over
+
+=item C<_index>
+
+This is the index in an array, or they key for a hash.
+
+=back
+
 =cut
 
 has 'handler' => (
@@ -88,6 +100,8 @@ has 'handler' => (
 
 =head1 METHODS
 
+=head2 C<run>
+
 =cut
 
 sub run {
@@ -95,6 +109,10 @@ sub run {
     $self->_set_is_testing(0);
     $self->process($struct);
 }
+
+=head2 C<test>
+
+=cut
 
 sub test {
     my ($self, $struct) = @_;
