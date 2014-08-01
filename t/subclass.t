@@ -4,27 +4,21 @@ use Moose;
 extends 'Struct::Flatten::Template';
 
 override 'process_ARRAY' => sub {
-    my ($self, $struct, $template) = @_;
+    my ( $self, $struct, $template ) = @_;
 
-    for (my $i = 0; $i <= $#{$template}; $i++) {
+    for ( my $i = 0; $i <= $#{$template}; $i++ ) {
         last if $i > $#{$struct};
         $self->process( $struct->[$i], $template->[$i], $i );
-    };
+    }
 };
-
 
 package main;
 
 use Test::Most;
 
 my $tmpl = {
-    foo => {
-        bar => \ { column => 0 }
-    },
-    baz => [
-        \ { column => 1 },
-        \ { column => 2 },
-        ],
+    foo => { bar => \{ column => 0 } },
+    baz => [ \{ column => 1 }, \{ column => 2 }, ],
 };
 
 my $struct = {
@@ -36,21 +30,20 @@ my $struct = {
 my @row;
 
 sub handler {
-    my ($obj, $val, $args) = @_;
+    my ( $obj, $val, $args ) = @_;
 
     my $col = $args->{column};
 
-    if (defined $row[$col]) {
-        push @{$row[$col]}, $val;
+    if ( defined $row[$col] ) {
+        push @{ $row[$col] }, $val;
     } else {
-        $row[$col] = [ $val ];
+        $row[$col] = [$val];
     }
 }
 
-isa_ok
-    my $p = MyClass->new(
-        handler  => \&handler,
-        template => $tmpl,
+isa_ok my $p = MyClass->new(
+    handler  => \&handler,
+    template => $tmpl,
     ),
     'Struct::Flatten::Template';
 

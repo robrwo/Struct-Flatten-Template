@@ -6,15 +6,13 @@ use_ok('Struct::Flatten::Template');
 
 tie my %keys, 'Tie::RefHash';
 
-my $key = \ { column => 0, title => 'X' };
+my $key = \{ column => 0, title => 'X' };
 
 $keys{$key} = 'a';
 
 my $tmpl = {
     foo => \%keys,
-    baz => [
-        \ { column => 1, indexed => 1, title => 'Y' },
-        ],
+    baz => [ \{ column => 1, indexed => 1, title => 'Y' }, ],
 };
 
 my $struct = {
@@ -27,11 +25,11 @@ my @head;
 my @row;
 
 sub handler {
-    my ($obj, $val, $args) = @_;
+    my ( $obj, $val, $args ) = @_;
 
     my $col = $args->{column};
 
-    if ($obj->is_testing) {
+    if ( $obj->is_testing ) {
 
         $head[$col] = $args->{title};
 
@@ -42,10 +40,9 @@ sub handler {
     }
 }
 
-isa_ok
-    my $p = Struct::Flatten::Template->new(
-        handler  => \&handler,
-        template => $tmpl,
+isa_ok my $p = Struct::Flatten::Template->new(
+    handler  => \&handler,
+    template => $tmpl,
     ),
     'Struct::Flatten::Template';
 

@@ -3,12 +3,8 @@ use Test::Most;
 use_ok('Struct::Flatten::Template');
 
 my $tmpl = {
-    foo => {
-        bar => \ { column => 0, title => 'X' }
-    },
-    baz => [
-        \ { column => 1, indexed => 1, title => 'Y' },
-        ],
+    foo => { bar => \{ column => 0, title => 'X' } },
+    baz => [ \{ column => 1, indexed => 1, title => 'Y' }, ],
 };
 
 my $struct = {
@@ -21,11 +17,11 @@ my @head;
 my @row;
 
 sub handler {
-    my ($obj, $val, $args) = @_;
+    my ( $obj, $val, $args ) = @_;
 
     my $col = $args->{column};
 
-    if ($obj->is_testing) {
+    if ( $obj->is_testing ) {
 
         $head[$col] = $args->{title};
 
@@ -36,10 +32,9 @@ sub handler {
     }
 }
 
-isa_ok
-    my $p = Struct::Flatten::Template->new(
-        handler  => \&handler,
-        template => $tmpl,
+isa_ok my $p = Struct::Flatten::Template->new(
+    handler  => \&handler,
+    template => $tmpl,
     ),
     'Struct::Flatten::Template';
 
