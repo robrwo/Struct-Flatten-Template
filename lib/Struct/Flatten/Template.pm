@@ -184,7 +184,13 @@ sub process_HASH {
 
             my %args = %{ ${$key} };
             $args{_index} = 0;
-            foreach my $skey ( keys %{$struct} ) {
+
+            my $sort
+                = ( !$self->is_testing && $args{_sort} )
+                ? $args{_sort}
+                : sub {0};
+
+            foreach my $skey ( sort { $sort->( $a, $b ) } keys %{$struct} ) {
                 $fn->( $self, $skey, \%args );
                 $self->process( $struct->{$skey}, $template->{$key}, $skey );
                 $args{_index}++;
