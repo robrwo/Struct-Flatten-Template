@@ -71,6 +71,12 @@ has 'is_testing' => (
     writer   => '_set_is_testing',
 );
 
+has 'ignore_missing' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 1,
+);
+
 =head2 C<handler>
 
 The handler is a reference to a function, e.g.
@@ -156,7 +162,10 @@ sub process {
 
         } else {
 
-            return if $type ne ref($struct);
+            return
+                if ( !$self->ignore_missing
+                && ( defined $struct )
+                && ( $type ne ref($struct) ) );
 
             my $method = "process_${type}";
             $method =~ s/::/_/g;
@@ -183,7 +192,8 @@ sub process_HASH {
 
         } else {
             $self->process( $struct->{$key}, $template->{$key}, $key )
-                if exists $struct->{$key};
+                if $self->ignore_missing || ( exists $struct->{$key} );
+
         }
     }
 }
