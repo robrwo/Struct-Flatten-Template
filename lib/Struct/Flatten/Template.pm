@@ -63,13 +63,19 @@ has 'template' => (
     required => 1,
 );
 
+# indicates testing mode - used for triggering all handlers, useful
+# when one wants to set column headings.
+
 has 'is_testing' => (
-    is       => 'rw',
+    is       => 'ro',
     isa      => 'Bool',
     default  => 0,
     init_arg => undef,
     writer   => '_set_is_testing',
 );
+
+# Ignore missing records in the data being processed. This allows you
+# to fill in default values.
 
 has 'ignore_missing' => (
     is      => 'rw',
@@ -128,6 +134,8 @@ sub test {
     $self->_set_is_testing(1);
     $self->process( $self->template );
 }
+
+# TODO: the handler should be a method that is subclassed
 
 sub _get_handler {
     my ( $self, $template ) = @_;
