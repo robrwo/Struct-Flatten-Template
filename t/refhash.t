@@ -4,16 +4,12 @@ use Tie::RefHash;
 
 use_ok('Struct::Flatten::Template');
 
-tie my %keys, 'Tie::RefHash';
+tie my %tmpl, 'Tie::RefHash::Nestable';
 
 my $key = \{ column => 0, title => 'X' };
 
-$keys{$key} = 'a';
-
-my $tmpl = {
-    foo => \%keys,
-    baz => [ \{ column => 1, indexed => 1, title => 'Y' }, ],
-};
+$tmpl{foo}->{$key} = 'a';
+$tmpl{baz} = [ \{ column => 1, indexed => 1, title => 'Y' }, ];
 
 my $struct = {
     foo  => { bar => 'a', },
@@ -42,7 +38,7 @@ sub handler {
 
 isa_ok my $p = Struct::Flatten::Template->new(
     handler  => \&handler,
-    template => $tmpl,
+    template => \%tmpl,
     ),
     'Struct::Flatten::Template';
 
