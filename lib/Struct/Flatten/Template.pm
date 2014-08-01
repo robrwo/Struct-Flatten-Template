@@ -58,8 +58,9 @@ TODO
 =cut
 
 has 'template' => (
-    is  => 'ro',
-    isa => 'Ref',
+    is       => 'ro',
+    isa      => 'Ref',
+    required => 1,
 );
 
 has 'is_testing' => (
