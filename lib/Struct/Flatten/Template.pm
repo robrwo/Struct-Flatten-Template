@@ -1,5 +1,7 @@
 package Struct::Flatten::Template;
 
+use 5.008;
+
 use Moose;
 
 use version 0.77; our $VERSION = version->declare('v0.1.0');
@@ -56,16 +58,16 @@ TODO
 =cut
 
 has 'template' => (
-    is => 'ro',
+    is  => 'ro',
     isa => 'Ref',
 );
 
 has 'is_testing' => (
-   is       => 'rw',
-   isa      => 'Bool',
-   default  => 0,
-   init_arg => undef,
-   writer   => '_set_is_testing',
+    is       => 'rw',
+    isa      => 'Bool',
+    default  => 0,
+    init_arg => undef,
+    writer   => '_set_is_testing',
 );
 
 =head2 C<handler>
@@ -105,7 +107,7 @@ has 'handler' => (
 =cut
 
 sub run {
-    my ($self, $struct) = @_;
+    my ( $self, $struct ) = @_;
     $self->_set_is_testing(0);
     $self->process($struct);
 }
@@ -115,18 +117,18 @@ sub run {
 =cut
 
 sub test {
-    my ($self, $struct) = @_;
+    my ( $self, $struct ) = @_;
     $self->_set_is_testing(1);
-    $self->process($self->template);
+    $self->process( $self->template );
 }
 
 sub _get_handler {
-    my ($self, $template) = @_;
+    my ( $self, $template ) = @_;
 
     my $type = ref $template;
     return unless $type;
 
-    if (($type eq 'REF') && (ref(${$template}) eq 'HASH')) {
+    if ( ( $type eq 'REF' ) && ( ref( ${$template} ) eq 'HASH' ) ) {
         return $self->handler;
     } else {
         return;
@@ -134,22 +136,22 @@ sub _get_handler {
 }
 
 sub process {
-    my ($self, @args) = @_;
+    my ( $self, @args ) = @_;
 
     no warnings 'recursion';
 
-    my $struct = $args[0];
+    my $struct   = $args[0];
     my $template = $#args ? $args[1] : $self->template;
-    my $index  = $args[2];
+    my $index    = $args[2];
 
-    if (my $type = ref($template)) {
+    if ( my $type = ref($template) ) {
 
-        if (my $fn = $self->_get_handler($template)) {
+        if ( my $fn = $self->_get_handler($template) ) {
 
-            my %args = %{${$template}};
+            my %args = %{ ${$template} };
             $args{_index} = $index if defined $index;
 
-            $fn->($self, $struct, \%args);
+            $fn->( $self, $struct, \%args );
 
         } else {
 
@@ -157,24 +159,22 @@ sub process {
 
             my $method = "process_${type}";
             $method =~ s/::/_/g;
-            if (my $fn = $self->can($method)) {
-                $self->$fn($struct, $template);
+            if ( my $fn = $self->can($method) ) {
+                $self->$fn( $struct, $template );
             }
         }
     }
- }
-
-
+}
 
 sub process_HASH {
-    my ($self, $struct, $template) = @_;
-    foreach my $key (keys %{$template}) {
+    my ( $self, $struct, $template ) = @_;
+    foreach my $key ( keys %{$template} ) {
 
-        if (my $fn = $self->_get_handler($key)) {
+        if ( my $fn = $self->_get_handler($key) ) {
 
-            my %args = %{${$key}};
-            foreach my $skey (keys %{$struct}) {
-                $fn->($self, $skey, \%args);
+            my %args = %{ ${$key} };
+            foreach my $skey ( keys %{$struct} ) {
+                $fn->( $self, $skey, \%args );
             }
 
             last;
@@ -187,10 +187,9 @@ sub process_HASH {
 }
 
 sub process_ARRAY {
-    my ($self, $struct, $template) = @_;
+    my ( $self, $struct, $template ) = @_;
     my $index = 0;
-    $self->process( $_, $template->[0], $index++ )
-        for @{$struct};
+    $self->process( $_, $template->[0], $index++ ) for @{$struct};
 }
 
 use namespace::autoclean;
