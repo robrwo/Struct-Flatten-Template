@@ -183,9 +183,11 @@ sub process_HASH {
         if ( my $fn = $self->_get_handler($key) ) {
 
             my %args = %{ ${$key} };
+            $args{_index} = 0;
             foreach my $skey ( keys %{$struct} ) {
                 $fn->( $self, $skey, \%args );
                 $self->process( $struct->{$skey}, $template->{$key}, $skey );
+                $args{_index}++;
             }
 
             last;
