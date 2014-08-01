@@ -176,6 +176,7 @@ sub process_HASH {
             my %args = %{ ${$key} };
             foreach my $skey ( keys %{$struct} ) {
                 $fn->( $self, $skey, \%args );
+                $self->process( $struct->{$skey}, $template->{$key}, $skey );
             }
 
             last;
