@@ -111,7 +111,22 @@ This is the index in an array, or they key for a hash.
 has 'handler' => (
     is  => 'ro',
     isa => 'Maybe[CodeRef]',
+    reader => '_get_handler',
+    writer => '_set_handler',
 );
+
+around '_get_handler' => sub {
+    my ( $orig, $self, $template ) = @_;
+
+    my $type = ref $template;
+    return unless $type;
+
+    if ( ( $type eq 'REF' ) && ( ref( ${$template} ) eq 'HASH' ) ) {
+        return $self->$orig;
+    } else {
+        return;
+    }
+};
 
 =head1 METHODS
 
@@ -133,21 +148,6 @@ sub test {
     my ( $self, $struct ) = @_;
     $self->_set_is_testing(1);
     $self->process( $self->template );
-}
-
-# TODO: the handler should be a method that is subclassed
-
-sub _get_handler {
-    my ( $self, $template ) = @_;
-
-    my $type = ref $template;
-    return unless $type;
-
-    if ( ( $type eq 'REF' ) && ( ref( ${$template} ) eq 'HASH' ) ) {
-        return $self->handler;
-    } else {
-        return;
-    }
 }
 
 sub process {
