@@ -10,7 +10,7 @@ use version 0.77; our $VERSION = version->declare('v0.1.0');
 
 Struct::Flatten::Template - flatten structures using a template
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
   use Struct::Flatten::Template;
 
