@@ -104,6 +104,14 @@ Note that C<$args> may have additional keys added to it:
 
 This is the index in an array, or they key for a hash.
 
+=item C<_next>
+
+If the handler is called for a hash key instead of a hash value or
+array element, then this is a reference to the value of the array.
+
+This can be used by the handler to set defaults for intermediate
+values, e.g. to fill in gaps in dates.
+
 =back
 
 =cut
