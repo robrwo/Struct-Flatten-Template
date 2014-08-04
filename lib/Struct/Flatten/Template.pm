@@ -192,6 +192,7 @@ sub process_HASH {
 
             my %args = %{ ${$key} };
             $args{_index} = 0;
+            $args{_next}  = $template->{$key};    # allow gap filling
 
             my $sort
                 = ( !$self->is_testing && $args{_sort} )
