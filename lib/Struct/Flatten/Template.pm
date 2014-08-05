@@ -8,7 +8,7 @@ use version 0.77; our $VERSION = version->declare('v0.1.0');
 
 =head1 NAME
 
-Struct::Flatten::Template - flatten structures using a template
+Struct::Flatten::Template - flatten data structures using a template
 
 =head1 SYNOPSIS
 
@@ -51,9 +51,66 @@ Struct::Flatten::Template - flatten structures using a template
 
 =head1 DESCRIPTION
 
-TODO
+This module is used for "flattening" complex, deeply-nested data
+structures, such as those returned by an ElasticSearch aggregation
+query.
+
+It is configured with a L</template> that mirrors the data structure,
+where some parts of the template contain information how to process
+the corresponding parts of the data structure.
 
 =head1 ATTRIBUTES
+
+=head2 C<template>
+
+This is a template of the data structure.
+
+This is basically a copy of the data structure, with the hash
+reference keys and values that you care to extract information from,
+using the L</handler>.
+
+To obtain a value, set it to a reference to a hash reference, e.g.
+
+  key => \ { ... }
+
+The keys in the hash reference can be whatever youre application
+needs, so long as they are not prefixed with an underscore.
+
+The following special keys are used:
+
+=over
+
+=item C<_index>
+
+This is either the array index of hash key or array item that the
+value is associated with.
+
+=item C<_sort>
+
+If set, this is a method used to sort hash keys, when the template
+refers to a list of hash keys, e.g.
+
+  key => \ {
+             _sort => sub { $_[0] cmp $_[1] },
+             ...
+           }
+
+=item C<_next>
+
+If your template is for hash keys instead of values, then this refers
+to the value of that hash key in the template.
+
+It is useful if you want to have your handler fill-in intermediate
+values (e.g. gaps in a list of dates) by calling the L</process>
+method.
+
+=back
+
+Note: to trigger a callback on hash keys instead of values, use
+L<Tie::RefHash>.
+
+Also note that templates for array references assume the first element
+applies to all elements of the data structure being processed.
 
 =cut
 
@@ -63,8 +120,16 @@ has 'template' => (
     required => 1,
 );
 
-# indicates testing mode - used for triggering all handlers, useful
-# when one wants to set column headings.
+=head2 C<is_testing>
+
+This is true if the template is being processed using L</test>.
+
+This is useful to extract meta-information from your template,
+e.g. field titles.
+
+It is intended to be used from within the L</handler>.
+
+=cut
 
 has 'is_testing' => (
     is       => 'ro',
@@ -74,8 +139,15 @@ has 'is_testing' => (
     writer   => '_set_is_testing',
 );
 
-# Ignore missing records in the data being processed. This allows you
-# to fill in default values.
+=head2 C<ignore_missing>
+
+If true, missing substructures will be ignored and the template will
+be processed.  This is useful for setting default values for missing
+parts of the structure.
+
+This is false by default.
+
+=cut
 
 has 'ignore_missing' => (
     is      => 'rw',
@@ -89,36 +161,29 @@ The handler is a reference to a function, e.g.
 
   sub {
     my ($obj, $value, $args) = @_;
-    ...
+
+    if ($obj->is_testing) {
+      ...
+    } else {
+      ...
+    }
   }
 
 where C<$obj> is the C<Struct::Flatten::Template> object, C<$value> is
 the value from the data structure being processed, and C<$args> is a
 hash reference from the template.
 
-Note that C<$args> may have additional keys added to it:
+Note that C<$args> may have additional keys added to it. See L</template>.
 
-=over
-
-=item C<_index>
-
-This is the index in an array, or they key for a hash.
-
-=item C<_next>
-
-If the handler is called for a hash key instead of a hash value or
-array element, then this is a reference to the value of the array.
-
-This can be used by the handler to set defaults for intermediate
-values, e.g. to fill in gaps in dates.
-
-=back
+Your handler will need to use the information in C<$args> to determine
+what to do with the data, e.g., where in a spreadsheet or what column
+in a database to it.
 
 =cut
 
 has 'handler' => (
-    is  => 'ro',
-    isa => 'Maybe[CodeRef]',
+    is     => 'ro',
+    isa    => 'Maybe[CodeRef]',
     reader => '_get_handler',
     writer => '_set_handler',
 );
@@ -140,6 +205,10 @@ around '_get_handler' => sub {
 
 =head2 C<run>
 
+  $obj->run( $struct );
+
+Process C<$struct> using the L</template>.
+
 =cut
 
 sub run {
@@ -150,6 +219,11 @@ sub run {
 
 =head2 C<test>
 
+  $obj->test();
+
+Test the template. Essentially, it processes the L</template> against
+itself.
+
 =cut
 
 sub test {
@@ -157,6 +231,22 @@ sub test {
     $self->_set_is_testing(1);
     $self->process( $self->template );
 }
+
+=head2 C<process>
+
+=head2 C<process_HASH>
+
+=head2 C<process_ARRAY>
+
+  $obj->process($struct, $template, $index);
+
+These are low-level methods for processing the template. In general,
+you don't need to worry about them unless you are subclassing this.
+
+If you are inserting intermediate values from within your handler,
+you should be calling the C<process> method.
+
+=cut
 
 sub process {
     my ( $self, @args ) = @_;
