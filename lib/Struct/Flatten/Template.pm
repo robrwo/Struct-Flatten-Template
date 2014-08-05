@@ -4,7 +4,7 @@ use 5.008;
 
 use Moose;
 
-use version 0.77; our $VERSION = version->declare('v0.1.0');
+use version 0.77; our $VERSION = version->declare('v0.1.1');
 
 =head1 NAME
 
@@ -325,7 +325,15 @@ use namespace::autoclean;
 
 =head1 SEE ALSO
 
-L<Hash::Flatten>
+The following alternative modules can be used to flatten hashes:
+
+=over
+
+=item L<Data::Hash::Flatten>
+
+=item L<Hash::Flatten>
+
+=back
 
 =head1 AUTHOR
 
