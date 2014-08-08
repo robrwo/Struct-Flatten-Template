@@ -134,9 +134,13 @@ It is intended to be used from within the L</handler>.
 has 'is_testing' => (
     is       => 'ro',
     isa      => 'Bool',
+    traits   => [qw/ Bool /],
     default  => 0,
     init_arg => undef,
-    writer   => '_set_is_testing',
+    handles  => {
+        '_set_is_testing' => 'set',
+        '_set_is_live'    => 'unset',
+    },
 );
 
 =head2 C<ignore_missing>
@@ -213,7 +217,7 @@ Process C<$struct> using the L</template>.
 
 sub run {
     my ( $self, $struct ) = @_;
-    $self->_set_is_testing(0);
+    $self->_set_is_live;
     $self->process($struct);
 }
 
@@ -228,7 +232,7 @@ itself.
 
 sub test {
     my ( $self, $struct ) = @_;
-    $self->_set_is_testing(1);
+    $self->_set_is_testing;
     $self->process( $self->template );
 }
 
