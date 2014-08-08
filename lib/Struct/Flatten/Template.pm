@@ -149,12 +149,12 @@ If true, missing substructures will be ignored and the template will
 be processed.  This is useful for setting default values for missing
 parts of the structure.
 
-This is false by default.
+This is true by default.
 
 =cut
 
 has 'ignore_missing' => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => 'Bool',
     default => 1,
 );

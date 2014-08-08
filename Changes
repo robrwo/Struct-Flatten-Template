@@ -2,8 +2,13 @@ Revision history for Struct-Flatten-Template
 
 v0.1.1
 
+  [Incompatabilities]
+  - ignore_missing is now a read-only attribute.
+
   [Documentation]
   - Added more modules to the SEE ALSO section.
+
+  - Corrected POD: ignore_missing is true by default.
 
   [Other Changes]
   - Minor code tweaks.
