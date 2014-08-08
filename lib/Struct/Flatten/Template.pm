@@ -325,6 +325,8 @@ sub process_ARRAY {
 
 use namespace::autoclean;
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 =head1 SEE ALSO
