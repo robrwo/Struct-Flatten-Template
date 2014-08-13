@@ -23,7 +23,10 @@ resources(
 
 configure_requires();
 
-build_requires( 'Test::Most' => 0, );
+build_requires(
+    'Test::Most'	=> 0,
+    'Test::Differences' => 0,
+);
 
 requires(
     'Moose'                => 0,
@@ -32,7 +35,10 @@ requires(
     'version'              => 0.77,
 );
 
-test_requires( 'Test::Most' => 0, );
+test_requires(
+    'Test::Most'	=> 0,
+    'Test::Differences' => 0,
+);
 
 install_as_cpan;
 auto_install;
