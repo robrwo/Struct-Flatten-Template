@@ -3,8 +3,8 @@ use Test::Most;
 use_ok('Struct::Flatten::Template');
 
 my $tmpl = {
-    foo => { bar => \{ column => 0, title => 'X' } },
-    baz => [ \{ column => 1, indexed => 1, title => 'Y' }, ],
+    foo => { bar => \{ column => 0, title => 'X', path_is => [qw/ foo HASH ? HASH /] } },
+    baz => [ \{ column => 1, indexed => 1, title => 'Y', path_is => [qw/ baz HASH ? ARRAY /]  }, ],
 };
 
 my $struct = {
@@ -19,6 +19,8 @@ my @row;
 sub handler {
     my ( $obj, $val, $args ) = @_;
 
+    note( explain [ $val, $args ] );
+
     my $col = $args->{column};
 
     if ( $obj->is_testing ) {
@@ -30,6 +32,16 @@ sub handler {
         $col += $args->{_index} if $args->{indexed};
         $row[$col] = $val;
     }
+
+    if ($args->{path_is}) {
+
+      my @expected = @{$args->{path_is}};
+      $expected[-2] = $args->{_index};
+
+      is_deeply($args->{_path}, \@expected, '_path');
+
+    }
+
 }
 
 isa_ok my $p = Struct::Flatten::Template->new(
