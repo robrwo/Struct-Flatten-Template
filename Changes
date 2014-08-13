@@ -1,6 +1,6 @@
 Revision history for Struct-Flatten-Template
 
-v0.1.1
+v0.1.1  2014-08-13
 
   [Incompatabilities]
   - Ignore_missing is now a read-only attribute.

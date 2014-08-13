@@ -69,6 +69,9 @@ ATTRIBUTES
         This is either the array index of hash key or array item that the
         value is associated with.
 
+        Note that this is deprecated, and may be removed in future versions.
+        Use _path instead.
+
     `_sort'
         If set, this is a method used to sort hash keys, when the template
         refers to a list of hash keys, e.g.
@@ -84,6 +87,17 @@ ATTRIBUTES
 
         It is useful if you want to have your handler fill-in intermediate
         values (e.g. gaps in a list of dates) by calling the process method.
+
+    `_path'
+        This contains an array reference of where in the data structure the
+        handler is being called.
+
+        The array is of the form
+
+          $key1 => $type1, $key2 => $type2, ...
+
+        where the keys refer to hash keys or array indices, and the types
+        are either `HASH' or `ARRAY'.
 
     Note: to trigger a callback on hash keys instead of values, use
     Tie::RefHash.
@@ -104,7 +118,7 @@ ATTRIBUTES
     processed. This is useful for setting default values for missing parts
     of the structure.
 
-    This is false by default.
+    This is true by default.
 
   `handler'
     The handler is a reference to a function, e.g.
@@ -153,6 +167,9 @@ METHODS
     should be calling the `process' method.
 
 SEE ALSO
+    The following alternative modules can be used to flatten hashes:
+
+    Data::Hash::Flatten
     Hash::Flatten
 
 AUTHOR
