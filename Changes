@@ -13,6 +13,9 @@ v0.1.1
   [Other Changes]
   - Minor code tweaks.
 
+  - Explicit prerequsite for Test::Differences that caused failures
+    for some CPAN Testers.
+
 v0.1.0  2014-08-01
 
   - Initial version released.
