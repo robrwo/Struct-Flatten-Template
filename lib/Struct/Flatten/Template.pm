@@ -59,6 +59,8 @@ It is configured with a L</template> that mirrors the data structure,
 where some parts of the template contain information how to process
 the corresponding parts of the data structure.
 
+=for readme stop
+
 =head1 ATTRIBUTES
 
 =head2 C<template>
@@ -356,6 +358,8 @@ use namespace::autoclean;
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=for readme continue
 
 =head1 SEE ALSO
 
