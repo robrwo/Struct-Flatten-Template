@@ -4,7 +4,7 @@ use 5.008;
 
 use Moose;
 
-use version 0.77; our $VERSION = version->declare('v0.1.0');
+use version 0.77; our $VERSION = version->declare('v0.1.1');
 
 =head1 NAME
 
@@ -85,6 +85,9 @@ The following special keys are used:
 This is either the array index of hash key or array item that the
 value is associated with.
 
+Note that this is deprecated, and may be removed in future
+versions. Use L</_path> instead.
+
 =item C<_sort>
 
 If set, this is a method used to sort hash keys, when the template
@@ -103,6 +106,18 @@ to the value of that hash key in the template.
 It is useful if you want to have your handler fill-in intermediate
 values (e.g. gaps in a list of dates) by calling the L</process>
 method.
+
+=item C<_path>
+
+This contains an array reference of where in the data structure the
+handler is being called.
+
+The array is of the form
+
+  $key1 => $type1, $key2 => $type2, ...
+
+where the keys refer to hash keys or array indices, and the types are
+either C<HASH> or C<ARRAY>.
 
 =back
 
@@ -134,9 +149,13 @@ It is intended to be used from within the L</handler>.
 has 'is_testing' => (
     is       => 'ro',
     isa      => 'Bool',
+    traits   => [qw/ Bool /],
     default  => 0,
     init_arg => undef,
-    writer   => '_set_is_testing',
+    handles  => {
+        '_set_is_testing' => 'set',
+        '_set_is_live'    => 'unset',
+    },
 );
 
 =head2 C<ignore_missing>
@@ -145,12 +164,12 @@ If true, missing substructures will be ignored and the template will
 be processed.  This is useful for setting default values for missing
 parts of the structure.
 
-This is false by default.
+This is true by default.
 
 =cut
 
 has 'ignore_missing' => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => 'Bool',
     default => 1,
 );
@@ -213,7 +232,7 @@ Process C<$struct> using the L</template>.
 
 sub run {
     my ( $self, $struct ) = @_;
-    $self->_set_is_testing(0);
+    $self->_set_is_live;
     $self->process($struct);
 }
 
@@ -228,7 +247,7 @@ itself.
 
 sub test {
     my ( $self, $struct ) = @_;
-    $self->_set_is_testing(1);
+    $self->_set_is_testing;
     $self->process( $self->template );
 }
 
@@ -256,6 +275,7 @@ sub process {
     my $struct   = $args[0];
     my $template = $#args ? $args[1] : $self->template;
     my $index    = $args[2];
+    my @path     = @{ $args[3] || [ ] };
 
     if ( my $type = ref($template) ) {
 
@@ -263,6 +283,7 @@ sub process {
 
             my %args = %{ ${$template} };
             $args{_index} = $index if defined $index;
+	    $args{_path}  = \@path;
 
             $fn->( $self, $struct, \%args );
 
@@ -276,14 +297,14 @@ sub process {
             my $method = "process_${type}";
             $method =~ s/::/_/g;
             if ( my $fn = $self->can($method) ) {
-                $self->$fn( $struct, $template );
+                $self->$fn( $struct, $template, \@path );
             }
         }
     }
 }
 
 sub process_HASH {
-    my ( $self, $struct, $template ) = @_;
+    my ( $self, $struct, $template, $path ) = @_;
     foreach my $key ( keys %{$template} ) {
 
         if ( my $fn = $self->_get_handler($key) ) {
@@ -297,16 +318,23 @@ sub process_HASH {
                 ? $args{_sort}
                 : sub {0};
 
+	    my @path = ( @{$path}, undef => 'HASH' );
+	    $args{_path} = \@path;
+
             foreach my $skey ( sort { $sort->( $a, $b ) } keys %{$struct} ) {
                 $fn->( $self, $skey, \%args );
-                $self->process( $struct->{$skey}, $template->{$key}, $skey );
+		$path[-2] = $skey;
+                $self->process( $struct->{$skey}, $template->{$key}, $skey, \@path );
                 $args{_index}++;
             }
 
             last;
 
         } else {
-            $self->process( $struct->{$key}, $template->{$key}, $key )
+
+	    my @path = ( @{$path}, $key => 'HASH' );
+
+            $self->process( $struct->{$key}, $template->{$key}, $key, \@path )
                 if $self->ignore_missing || ( exists $struct->{$key} );
 
         }
@@ -314,18 +342,32 @@ sub process_HASH {
 }
 
 sub process_ARRAY {
-    my ( $self, $struct, $template ) = @_;
-    my $index = 0;
-    $self->process( $_, $template->[0], $index++ ) for @{$struct};
+    my ( $self, $struct, $template, $path ) = @_;
+    my @path = ( @{$path}, 0 => 'ARRAY' );
+    foreach my $s (@{$struct}) {
+	$self->process( $s, $template->[0], $path[-2], \@path );
+	$path[-2]++;
+    }
+
 }
 
 use namespace::autoclean;
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
 =head1 SEE ALSO
 
-L<Hash::Flatten>
+The following alternative modules can be used to flatten hashes:
+
+=over
+
+=item L<Data::Hash::Flatten>
+
+=item L<Hash::Flatten>
+
+=back
 
 =head1 AUTHOR
 
