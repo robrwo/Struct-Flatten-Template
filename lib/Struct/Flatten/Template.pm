@@ -275,7 +275,7 @@ sub process {
     my $struct   = $args[0];
     my $template = $#args ? $args[1] : $self->template;
     my $index    = $args[2];
-    my @path     = @{ $args[3] // [ ] };
+    my @path     = @{ $args[3] || [ ] };
 
     if ( my $type = ref($template) ) {
 
