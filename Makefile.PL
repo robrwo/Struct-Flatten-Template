@@ -6,7 +6,7 @@ use inc::Module::Install;
 
 name 'Struct-Flatten-Template';
 all_from 'lib/Struct/Flatten/Template.pm';
-license 'artistic2';
+license 'artistic_2';
 
 perl_version 5.008;
 
