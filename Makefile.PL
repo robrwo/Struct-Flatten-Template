@@ -17,9 +17,9 @@ resources(
     bugtracker => 'https://github.com/robrwo/Struct-Flatten-Template/issues',
 );
 
-configure_requires(
-    'Module::Install::AuthorTests' => 0.02,
-);
+# configure_requires(
+#     'Module::Install::AuthorTests' => 0.02,
+# );
 
 build_requires(
     'Test::Most'	=> 0,
@@ -40,7 +40,7 @@ test_requires(
 
 tests_recursive('t');
 
-author_tests('xt');
+# author_tests('xt');
 
 install_as_cpan;
 auto_install;
