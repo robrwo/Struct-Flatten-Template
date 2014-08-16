@@ -6,13 +6,9 @@ use inc::Module::Install;
 
 name 'Struct-Flatten-Template';
 all_from 'lib/Struct/Flatten/Template.pm';
-license 'artistic2';
+license 'artistic_2';
 
 perl_version 5.008;
-
-tests_recursive('t');
-
-# tests_recursive('xt');
 
 resources(
     homepage   => 'http://rrwo.tumblr.com',
@@ -21,7 +17,9 @@ resources(
     bugtracker => 'https://github.com/robrwo/Struct-Flatten-Template/issues',
 );
 
-configure_requires();
+# configure_requires(
+#     'Module::Install::AuthorTests' => 0.02,
+# );
 
 build_requires(
     'Test::Most'	=> 0,
@@ -39,6 +37,10 @@ test_requires(
     'Test::Most'	=> 0,
     'Test::Differences' => 0,
 );
+
+tests_recursive('t');
+
+# author_tests('xt');
 
 install_as_cpan;
 auto_install;

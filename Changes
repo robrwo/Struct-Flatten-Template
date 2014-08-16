@@ -1,5 +1,10 @@
 Revision history for Struct-Flatten-Template
 
+v0.1.2
+
+  [Other Changes]
+  - Corrected license type to make CPANTS happy.
+
 v0.1.1  2014-08-13
 
   [Incompatabilities]
