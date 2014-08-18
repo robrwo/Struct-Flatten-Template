@@ -4,7 +4,7 @@ use 5.008;
 
 use Moose;
 
-use version 0.77; our $VERSION = version->declare('v0.1.2');
+use version 0.77; our $VERSION = version->declare('v0.1.3');
 
 =head1 NAME
 
